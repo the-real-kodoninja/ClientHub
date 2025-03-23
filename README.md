@@ -98,7 +98,7 @@ MIT License
 
 ## 📧 Contact
 
-Got questions? Reach out at `your-email@example.com`.
+Got questions? Reach out at [email](emmanuel.moore@live.com).
 
 ---
 
