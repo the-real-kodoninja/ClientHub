@@ -44,8 +44,14 @@ class NimbusAI:
 
     def batch_process(self, clients: list):
         try:
-            return self.canister.batch_process(clients)  # Hypothetical bulk method
+            return self.canister.batch_process(clients)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Batch processing failed: {str(e)}")
+
+    def send_nimbus_message(self, assignment_id: str, message: str):
+        try:
+            return self.canister.send_nimbus_message(assignment_id, message)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Nimbus message failed: {str(e)}")
 
 nimbus_service = NimbusAI()

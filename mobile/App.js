@@ -6,6 +6,7 @@ import DashboardScreen from './screens/DashboardScreen';
 import ClientListScreen from './screens/ClientListScreen';
 import LogsScreen from './screens/LogsScreen';
 import LoginScreen from './screens/LoginScreen';
+import MessagesScreen from './screens/MessagesScreen';
 
 const Stack = createStackNavigator();
 
@@ -17,6 +18,7 @@ export default function App() {
         <Stack.Screen name="Dashboard" component={DashboardScreen} />
         <Stack.Screen name="Clients" component={ClientListScreen} />
         <Stack.Screen name="Logs" component={LogsScreen} />
+        <Stack.Screen name="Messages" component={MessagesScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

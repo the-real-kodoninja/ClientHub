@@ -3,12 +3,13 @@ from fastapi import FastAPI, Depends, WebSocket
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from .utils.config import Config
-from .api import clients, promotions, auth
+from .api import clients, promotions, auth, messages
 from .api.ai_integration import nimbus_service
 from .models.user import Base as UserBase
 from .models.client import Base as ClientBase
 from .models.assignment import Base as AssignmentBase
 from .models.log import Base as LogBase
+from .models.message import Base as MessageBase
 import asyncio
 
 app = FastAPI()
@@ -25,6 +26,7 @@ def get_db():
 app.include_router(clients.app)
 app.include_router(promotions.app)
 app.include_router(auth.app)
+app.include_router(messages.app)
 
 @app.get("/")
 def read_root():
@@ -49,3 +51,4 @@ UserBase.metadata.create_all(bind=engine)
 ClientBase.metadata.create_all(bind=engine)
 AssignmentBase.metadata.create_all(bind=engine)
 LogBase.metadata.create_all(bind=engine)
+MessageBase.metadata.create_all(bind=engine)

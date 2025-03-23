@@ -29,6 +29,7 @@ function Dashboard() {
       <ul>
         <li><a href="/clients">View Clients</a></li>
         <li><a href="/logs">View Logs</a></li>
+        <li><a href="/messages">Messages</a></li>
       </ul>
     </div>
   );

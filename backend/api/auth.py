@@ -7,6 +7,7 @@ from ..main import get_db
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -16,6 +17,20 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+class UserUpdate(BaseModel):
+    email: str | None = None
+    twitter_api_key: str | None = None
+    twitter_api_secret: str | None = None
+    twitter_access_token: str | None = None
+    twitter_access_token_secret: str | None = None
+    linkedin_email: str | None = None
+    linkedin_password: str | None = None
+    instagram_username: str | None = None
+    instagram_password: str | None = None
+    freelancer_url: str | None = None
+    fiverr_url: str | None = None
+    portfolio_url: str | None = None
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -58,3 +73,15 @@ async def create_user(username: str, email: str, password: str, db: Session = De
     db.commit()
     db.refresh(user)
     return {"username": user.username, "email": user.email}
+
+@app.put("/users/me")
+async def update_user(
+    user_update: UserUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    for field, value in user_update.dict(exclude_unset=True).items():
+        setattr(current_user, field, value)
+    db.commit()
+    db.refresh(current_user)
+    return {"username": current_user.username, "email": current_user.email}
