@@ -1,28 +1,28 @@
-// frontend/src/components/Logs.js
-import React, { useEffect, useState } from 'react';
+// frontend/src/components/Login.js
+import React, { useState } from 'react';
 import axios from 'axios';
 
-function Logs() {
-  const [logs, setLogs] = useState([]);
+function Login({ setToken }) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-  useEffect(() => {
-    axios.get('http://127.0.0.1:8000/logs/')
-      .then(response => setLogs(response.data))
-      .catch(error => console.error('Error fetching logs:', error));
-  }, []);
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/token', { username, password });
+      setToken(response.data.access_token);
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
+  };
 
   return (
     <div>
-      <h1>Activity Logs</h1>
-      <ul>
-        {logs.map((log, index) => (
-          <li key={index}>
-            {log.timestamp} - {log.action}: {log.details}
-          </li>
-        ))}
-      </ul>
+      <h1>Login</h1>
+      <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
+      <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Password" />
+      <button onClick={handleLogin}>Login</button>
     </div>
   );
 }
 
-export default Logs;
+export default Login;

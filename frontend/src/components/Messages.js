@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-function Messages() {
+function Messages({ token }) {
   const [messages, setMessages] = useState([]);
   const [clientId, setClientId] = useState('');
   const [assignmentId, setAssignmentId] = useState('');
@@ -13,14 +13,16 @@ function Messages() {
       const params = {};
       if (clientId) params.client_id = clientId;
       if (assignmentId) params.assignment_id = assignmentId;
-      const response = await axios.get('http://127.0.0.1:8000/messages/', { params });
+      const response = await axios.get('http://127.0.0.1:8000/messages/', {
+        params,
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setMessages(response.data);
     };
     fetchMessages();
-  }, [clientId, assignmentId]);
+  }, [clientId, assignmentId, token]);
 
   const sendMessage = async () => {
-    const token = "your-token-here";  // Replace with actual token from login
     await axios.post(
       'http://127.0.0.1:8000/messages/',
       { client_id: clientId || null, assignment_id: assignmentId || null, content },
@@ -28,7 +30,8 @@ function Messages() {
     );
     setContent('');
     const response = await axios.get('http://127.0.0.1:8000/messages/', {
-      params: { client_id: clientId, assignment_id: assignmentId }
+      params: { client_id: clientId, assignment_id: assignmentId },
+      headers: { Authorization: `Bearer ${token}` }
     });
     setMessages(response.data);
   };

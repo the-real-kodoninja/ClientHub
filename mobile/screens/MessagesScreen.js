@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, ScrollView } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function MessagesScreen() {
   const [messages, setMessages] = useState([]);
@@ -11,17 +12,21 @@ export default function MessagesScreen() {
 
   useEffect(() => {
     const fetchMessages = async () => {
+      const token = await AsyncStorage.getItem('token');
       const params = {};
       if (clientId) params.client_id = clientId;
       if (assignmentId) params.assignment_id = assignmentId;
-      const response = await axios.get('http://127.0.0.1:8000/messages/', { params });
+      const response = await axios.get('http://127.0.0.1:8000/messages/', {
+        params,
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setMessages(response.data);
     };
     fetchMessages();
   }, [clientId, assignmentId]);
 
   const sendMessage = async () => {
-    const token = "your-token-here";  // Replace with actual token
+    const token = await AsyncStorage.getItem('token');
     await axios.post(
       'http://127.0.0.1:8000/messages/',
       { client_id: clientId || null, assignment_id: assignmentId || null, content },
@@ -29,7 +34,8 @@ export default function MessagesScreen() {
     );
     setContent('');
     const response = await axios.get('http://127.0.0.1:8000/messages/', {
-      params: { client_id: clientId, assignment_id: assignmentId }
+      params: { client_id: clientId, assignment_id: assignmentId },
+      headers: { Authorization: `Bearer ${token}` }
     });
     setMessages(response.data);
   };

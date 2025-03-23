@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState('');
@@ -9,11 +10,8 @@ export default function LoginScreen({ navigation }) {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/token', {
-        username,
-        password
-      });
-      // Store token locally (e.g., AsyncStorage in production)
+      const response = await axios.post('http://127.0.0.1:8000/token', { username, password });
+      await AsyncStorage.setItem('token', response.data.access_token);
       navigation.navigate('Dashboard');
     } catch (error) {
       console.error('Login failed:', error);

@@ -11,5 +11,6 @@ linkedin-api
 instagrapi
 passlib[bcrypt]
 python-jose[cryptography]
+stripe
 
 // pip install -r requirements.txt
