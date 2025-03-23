@@ -32,6 +32,8 @@ async def websocket_endpoint(websocket: WebSocket, assignment_id: str):
         while True:
             status = nimbus_service.get_assignment_status(assignment_id)
             await websocket.send_text(status)
+            if status == "Completed":  # Hypothetical status
+                promotion_service.promote_assignment_done(assignment_id)
             await asyncio.sleep(5)
     except Exception:
         await websocket.close()

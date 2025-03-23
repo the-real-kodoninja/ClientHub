@@ -30,4 +30,22 @@ class NimbusAI:
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to get status: {str(e)}")
 
+    def auto_communicate(self, client_name: str, message: str):
+        try:
+            return self.canister.send_message(client_name, message)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Communication failed: {str(e)}")
+
+    def prioritize_tasks(self, client_list: list):
+        try:
+            return self.canister.prioritize_tasks(client_list)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Prioritization failed: {str(e)}")
+
+    def batch_process(self, clients: list):
+        try:
+            return self.canister.batch_process(clients)  # Hypothetical bulk method
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Batch processing failed: {str(e)}")
+
 nimbus_service = NimbusAI()

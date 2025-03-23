@@ -16,5 +16,16 @@ class Config:
     PHONE_TO = os.getenv("PHONE_TO", "+1987654321")
     NIMBUS_DID_PATH = os.getenv("NIMBUS_DID_PATH", "../nimbus.did")
     NIMBUS_CANISTER_ID = os.getenv("NIMBUS_CANISTER_ID", "your_canister_id")
-    FREELANCER_PROFILE_URL = os.getenv("FREELANCER_PROFILE_URL", "https://www.freelancer.com/u/yourusername")
-    FIVERR_PROFILE_URL = os.getenv("FIVERR_PROFILE_URL", "https://www.fiverr.com/yourusername")
+    TWITTER_API_KEY = os.getenv("TWITTER_API_KEY", "your_twitter_api_key")
+    TWITTER_API_SECRET = os.getenv("TWITTER_API_SECRET", "your_twitter_api_secret")
+    TWITTER_ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN", "your_twitter_access_token")
+    TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET", "your_twitter_access_token_secret")
+    LINKEDIN_EMAIL = os.getenv("LINKEDIN_EMAIL", "your_linkedin_email")
+    LINKEDIN_PASSWORD = os.getenv("LINKEDIN_PASSWORD", "your_linkedin_password")
+    INSTAGRAM_USERNAME = os.getenv("INSTAGRAM_USERNAME", "your_instagram_username")
+    INSTAGRAM_PASSWORD = os.getenv("INSTAGRAM_PASSWORD", "your_instagram_password")
+    DEFAULT_PROFILE_URLS = {
+        "Freelancer": os.getenv("FREELANCER_PROFILE_URL", "https://www.freelancer.com/u/yourusername"),
+        "Fiverr": os.getenv("FIVERR_PROFILE_URL", "https://www.fiverr.com/yourusername"),
+        "Portfolio": os.getenv("PORTFOLIO_URL", "https://yourwebsite.com")
+    }

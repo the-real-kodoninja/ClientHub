@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard';
 import ClientList from './components/ClientList';
 import AssignmentView from './components/AssignmentView';
 import PromoBanner from './components/PromoBanner';
+import Logs from './components/Logs';
 import './App.css';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/clients" element={<ClientList />} />
           <Route path="/assignment/:id" element={<AssignmentView />} />
+          <Route path="/logs" element={<Logs />} />
         </Routes>
       </div>
     </Router>
