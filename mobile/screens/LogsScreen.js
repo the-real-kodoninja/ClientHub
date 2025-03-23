@@ -1,25 +1,42 @@
-// ClientHubMobile/screens/LogsScreen.js
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+// ClientHubMobile/screens/LoginScreen.js
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button } from 'react-native';
 import axios from 'axios';
 
-export default function LogsScreen() {
-  const [logs, setLogs] = useState([]);
+export default function LoginScreen({ navigation }) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-  useEffect(() => {
-    axios.get('http://127.0.0.1:8000/logs/')
-      .then(response => setLogs(response.data))
-      .catch(error => console.error('Error fetching logs:', error));
-  }, []);
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/token', {
+        username,
+        password
+      });
+      // Store token locally (e.g., AsyncStorage in production)
+      navigation.navigate('Dashboard');
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
+  };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: '#f5f5f0', padding: 10 }}>
-      <Text style={{ color: '#4a7048', fontSize: 24 }}>Activity Logs</Text>
-      {logs.map((log, index) => (
-        <Text key={index} style={{ color: '#8b6f47', marginVertical: 5 }}>
-          {log.timestamp} - {log.action}: {log.details}
-        </Text>
-      ))}
-    </ScrollView>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f0' }}>
+      <Text style={{ color: '#4a7048', fontSize: 24 }}>Login to ClientHub</Text>
+      <TextInput
+        placeholder="Username"
+        value={username}
+        onChangeText={setUsername}
+        style={{ borderWidth: 1, padding: 10, margin: 10, width: 200 }}
+      />
+      <TextInput
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        style={{ borderWidth: 1, padding: 10, margin: 10, width: 200 }}
+      />
+      <Button title="Login" onPress={handleLogin} color="#8b6f47" />
+    </View>
   );
 }

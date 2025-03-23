@@ -12,21 +12,27 @@ app = FastAPI()
 
 class PromotionService:
     def __init__(self):
-        # Twitter
-        self.twitter_client = tweepy.Client(
-            consumer_key=Config.TWITTER_API_KEY,
-            consumer_secret=Config.TWITTER_API_SECRET,
-            access_token=Config.TWITTER_ACCESS_TOKEN,
-            access_token_secret=Config.TWITTER_ACCESS_TOKEN_SECRET
-        )
-        # LinkedIn
-        self.linkedin_client = Linkedin(Config.LINKEDIN_EMAIL, Config.LINKEDIN_PASSWORD)
-        # Instagram
-        self.insta_client = InstaClient()
-        self.insta_client.login(Config.INSTAGRAM_USERNAME, Config.INSTAGRAM_PASSWORD)
+        self.clients = {}
 
-    def get_promo_message(self, context: str = "general", user_profiles: dict = None):
-        profiles = user_profiles or Config.DEFAULT_PROFILE_URLS
+    def initialize_client(self, user_id: int, db: Session):
+        if user_id not in self.clients:
+            config = Config.get_user_config(user_id, db)
+            self.clients[user_id] = {
+                "twitter": tweepy.Client(
+                    consumer_key=config["TWITTER_API_KEY"],
+                    consumer_secret=config["TWITTER_API_SECRET"],
+                    access_token=config["TWITTER_ACCESS_TOKEN"],
+                    access_token_secret=config["TWITTER_ACCESS_TOKEN_SECRET"]
+                ),
+                "linkedin": Linkedin(config["LINKEDIN_EMAIL"], config["LINKEDIN_PASSWORD"]),
+                "instagram": InstaClient()
+            }
+            self.clients[user_id]["instagram"].login(config["INSTAGRAM_USERNAME"], config["INSTAGRAM_PASSWORD"])
+        return self.clients[user_id]
+
+    def get_promo_message(self, context: str, user_id: int, db: Session):
+        config = Config.get_user_config(user_id, db)
+        profiles = config["PROFILE_URLS"]
         base_message = "Need top freelance services? Hire me now!"
         if context == "new_client":
             return f"{base_message} Just added a new client – join them! {profiles['Portfolio']}"
@@ -34,53 +40,56 @@ class PromotionService:
             return f"{base_message} Just completed a project – book me! {profiles['Portfolio']}"
         return f"{base_message} {profiles['Portfolio']}"
 
-    def log_activity(self, action: str, details: str, user_id: int = 1, db: Session = None):
+    def log_activity(self, action: str, details: str, user_id: int, db: Session):
         log = Log(user_id=user_id, action=action, details=details)
         db.add(log)
         db.commit()
 
-    def post_to_twitter(self, message: str, db: Session):
+    def post_to_twitter(self, message: str, user_id: int, db: Session):
+        clients = self.initialize_client(user_id)
         try:
-            self.twitter_client.create_tweet(text=message[:280])
-            self.log_activity("Tweet posted", message, db=db)
+            clients["twitter"].create_tweet(text=message[:280])
+            self.log_activity("Tweet posted", message, user_id, db)
             return {"platform": "Twitter", "status": "Posted"}
         except Exception as e:
-            self.log_activity("Tweet failed", str(e), db=db)
+            self.log_activity("Tweet failed", str(e), user_id, db)
             return {"platform": "Twitter", "status": "Failed", "error": str(e)}
 
-    def post_to_linkedin(self, message: str, db: Session):
+    def post_to_linkedin(self, message: str, user_id: int, db: Session):
+        clients = self.initialize_client(user_id)
         try:
-            self.linkedin_client.post(message)
-            self.log_activity("LinkedIn post", message, db=db)
+            clients["linkedin"].post(message)
+            self.log_activity("LinkedIn post", message, user_id, db)
             return {"platform": "LinkedIn", "status": "Posted"}
         except Exception as e:
-            self.log_activity("LinkedIn failed", str(e), db=db)
+            self.log_activity("LinkedIn failed", str(e), user_id, db)
             return {"platform": "LinkedIn", "status": "Failed", "error": str(e)}
 
-    def post_to_instagram(self, message: str, db: Session):
+    def post_to_instagram(self, message: str, user_id: int, db: Session):
+        clients = self.initialize_client(user_id)
         try:
-            self.insta_client.photo_upload_to_story("promo_image.jpg", caption=message[:2200])  # Requires an image
-            self.log_activity("Instagram story posted", message, db=db)
+            clients["instagram"].photo_upload_to_story("promo_image.jpg", caption=message[:2200])
+            self.log_activity("Instagram story posted", message, user_id, db)
             return {"platform": "Instagram", "status": "Posted"}
         except Exception as e:
-            self.log_activity("Instagram failed", str(e), db=db)
+            self.log_activity("Instagram failed", str(e), user_id, db)
             return {"platform": "Instagram", "status": "Failed", "error": str(e)}
 
-    def promote_everywhere(self, context: str, user_id: int = 1, user_profiles: dict = None, db: Session = None):
-        message = self.get_promo_message(context, user_profiles)
+    def promote_everywhere(self, context: str, user_id: int, db: Session):
+        message = self.get_promo_message(context, user_id)
         results = [
-            self.post_to_twitter(f"{message} #Freelance #HireMe", db),
-            self.post_to_linkedin(message, db),
-            self.post_to_instagram(f"{message} #FreelanceLife", db)
+            self.post_to_twitter(f"{message} #Freelance #HireMe", user_id, db),
+            self.post_to_linkedin(message, user_id, db),
+            self.post_to_instagram(f"{message} #FreelanceLife", user_id, db)
         ]
         return results
 
 promotion_service = PromotionService()
 
 @app.get("/promotions/")
-def get_promotions(context: str = "general"):
-    return promotion_service.get_promo_message(context)
+def get_promotions(context: str = "general", user_id: int = 1):
+    return promotion_service.get_promo_message(context, user_id)
 
 @app.post("/promotions/everywhere/")
 def promote_everywhere(context: str, user_id: int = 1, db: Session = Depends(get_db)):
-    return promotion_service.promote_everywhere(context, user_id, db=db)
+    return promotion_service.promote_everywhere(context, user_id, db)
