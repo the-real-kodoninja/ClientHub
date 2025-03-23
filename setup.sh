@@ -24,6 +24,10 @@ sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE clienthub TO clienthu
 # Backend setup
 cd backend
 pip3 install -r requirements.txt
+echo "STRIPE_SECRET_KEY=your_stripe_secret_key" > .env
+echo "STRIPE_PRICE_ID=your_price_id" >> .env
+echo "EMAIL_SENDER=your_email@gmail.com" >> .env
+echo "EMAIL_PASSWORD=your_app_password" >> .env
 python3 -m uvicorn main:app --reload &
 
 # Frontend setup
@@ -39,3 +43,4 @@ npm install @react-navigation/native @react-navigation/drawer react-native-reani
 npx expo start &
 
 echo "Setup complete! Backend at http://localhost:8000, Frontend at http://localhost:3000, Mobile via Expo."
+echo "Replace .env values with your own credentials."

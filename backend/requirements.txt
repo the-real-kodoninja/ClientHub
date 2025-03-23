@@ -16,6 +16,8 @@ facebook-sdk
 tiktokapi
 google-auth-oauthlib
 google-api-python-client
-python-dotenv  # For environment variables
+python-dotenv
+pinterest-api
+PyGithub
 
 // pip install -r requirements.txt
