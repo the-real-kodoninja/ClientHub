@@ -12,5 +12,7 @@ instagrapi
 passlib[bcrypt]
 python-jose[cryptography]
 stripe
+facebook-sdk
+tiktokapi
 
 // pip install -r requirements.txt

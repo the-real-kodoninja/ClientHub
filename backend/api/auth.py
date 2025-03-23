@@ -85,3 +85,13 @@ async def update_user(
     db.commit()
     db.refresh(current_user)
     return {"username": current_user.username, "email": current_user.email}
+
+@app.get("/users/me")
+async def get_user(user: User = Depends(get_current_user)):
+return {
+    "username": user.username,
+    "email": user.email,
+    "social_media_configs": user.social_media_configs,
+    "freelance_accounts": user.freelance_accounts,
+    "wallet_address": user.wallet_address
+}

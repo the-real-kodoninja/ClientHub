@@ -8,6 +8,8 @@ from ..models.user import User
 import tweepy
 from linkedin_api import Linkedin
 from instagrapi import Client as InstaClient
+import facebook
+from tiktokapi import TikTokAPI
 
 app = FastAPI()
 
@@ -38,7 +40,10 @@ class PromotionService:
             client = InstaClient()
             client.login(config["username"], config["password"])
             return client
-        # Add more platforms here (e.g., "facebook")
+        elif platform == "facebook":
+            return facebook.GraphAPI(access_token=config["access_token"])
+        elif platform == "tiktok":
+            return TikTokAPI(username=config["username"], password=config["password"])
         return None
 
     def get_promo_message(self, context: str, user_id: int, db: Session):
@@ -69,7 +74,10 @@ class PromotionService:
                 client.post(message)
             elif platform == "instagram":
                 client.photo_upload_to_story("promo_image.jpg", caption=message[:2200])
-            # Add more platforms here
+            elif platform == "facebook":
+                client.put_object(parent_object="me", connection_name="feed", message=message)
+            elif platform == "tiktok":
+                client.upload_video("promo_video.mp4", description=message[:150])  # Requires a video file
             self.log_activity(f"{platform} posted", message, user_id, db)
             return {"platform": platform, "status": "Posted"}
         except Exception as e:
